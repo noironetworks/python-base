@@ -175,10 +175,13 @@ class WSClient:
                 return
             elif op_code == ABNF.OPCODE_BINARY or op_code == ABNF.OPCODE_TEXT:
                 data = frame.data
-                if six.PY3:
-                    data = data.decode("utf-8")
                 if len(data) > 1:
-                    channel = ord(data[0])
+                    if six.PY3:
+                        # On Python 3 indexing a byte string already
+                        # gives an integer.
+                        channel = data[0]
+                    else:
+                        channel = ord(data[0])
                     data = data[1:]
                     if data:
                         if channel in [STDOUT_CHANNEL, STDERR_CHANNEL]:
